@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AgroSense Forecasting</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; max-width:900px; margin:32px auto; padding:0 16px; color:#222 }
+    h1 { color:#1b5e20 }
+    label { display:block; margin-top:12px }
+    textarea { width:100%; height:120px; font-family:monospace }
+    input[type=text] { width:100% }
+    button { margin-top:12px; padding:10px 14px; background:#1b5e20; color:#fff; border:none; cursor:pointer }
+    pre { background:#f4f4f4; padding:12px; overflow:auto }
+    .note { font-size:0.9em; color:#555 }
+  </style>
+</head>
+<body>
+  <h1>AgroSense Forecasting</h1>
+
+  <p class="note">This simple demo calls your Azure Function / Azure AI Agent to get a crop forecast. <strong>Do not embed production keys in client-side code.</strong> Use a server-side proxy or Azure-managed identity for production.</p>
+
+  <label for="input">Input (JSON or plain text):</label>
+  <textarea id="input">{
+  "location": "tropical",
+  "crop": "maize",
+  "area_ha": 1.0,
+  "planting_month": "June"
+}</textarea>
+
+  <label for="endpoint">Azure Function / Agent Endpoint URL:</label>
+  <input id="endpoint" type="text" placeholder="https://<your-function>.azurewebsites.net/api/forecast" />
+
+  <label for="apikey">Azure API Key (for demo only):</label>
+  <input id="apikey" type="text" placeholder="<YOUR_AZURE_KEY>" />
+
+  <button id="call">Get Forecast</button>
+
+  <h3>Response</h3>
+  <pre id="out">(no response yet)</pre>
+
+  <script>
+    // IMPORTANT NOTES:
+    // - The API key shown below is used directly in this client for demo purposes only.
+    // - Never store production keys in client-side code or commit them to source control.
+    // - Recommended: Have this page call your own backend, which forwards requests to Azure using a Key Vault-backed secret or a managed identity.
+
+    const callBtn = document.getElementById('call');
+    const out = document.getElementById('out');
+
+    async function doCall() {
+      out.textContent = 'Calling...';
+      const endpoint = document.getElementById('endpoint').value.trim();
+      const key = document.getElementById('apikey').value.trim();
+      let payload;
+      try {
+        payload = JSON.parse(document.getElementById('input').value);
+      } catch (e) {
+        payload = { text: document.getElementById('input').value };
+      }
+
+      if (!endpoint) { out.textContent = 'Please enter the endpoint URL.'; return }
+      if (!key) { out.textContent = 'Please enter the Azure API key (demo only).'; return }
+
+      try {
+        // Example request — adjust path depending on your Function or Agent API
+        // If calling Azure OpenAI chat/completions-style endpoint, change as appropriate.
+        const url = endpoint; // e.g. https://<your-function>.azurewebsites.net/api/forecast
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // For Azure Functions you might expect a header like 'x-functions-key' or an 'api-key' header
+            'x-api-key': key
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        if (!res.ok) {
+          out.textContent = `Error ${res.status}: ${text}`;
+          return;
+        }
+
+        // Try to pretty-print JSON response
+        try {
+          const obj = JSON.parse(text);
+          out.textContent = JSON.stringify(obj, null, 2);
+        } catch (e) {
+          out.textContent = text;
+        }
+
+      } catch (err) {
+        out.textContent = 'Request failed: ' + err;
+      }
+    }
+
+    callBtn.addEventListener('click', doCall);
+  </script>
+</body>
+</html>

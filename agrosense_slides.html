@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AgroSense — Pitch Deck</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:#0b2239; color:#fff }
+    .slide { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; padding:40px; box-sizing:border-box }
+    .card { max-width:960px }
+    h1,h2 { margin:0 0 12px 0 }
+    p { margin:8px 0 }
+    .small { color:#bcd; font-size:14px }
+    .meta { color:#9ecbff }
+    .hint { color:#9ecbff; font-size:14px; margin-top:18px }
+    .footer { position:fixed; bottom:12px; right:18px; color:#9ecbff; font-size:13px }
+  </style>
+</head>
+<body>
+  <div class="slide" id="s1">
+    <div class="card">
+      <h1>AgroSense</h1>
+      <h2>Real-time market prices, forecasts & verified buyers — in Hausa & English</h2>
+      <p class="small">Team: AgroSense — Demo for Nigeria AI Hackathon</p>
+      <p class="hint">90s demo: show price query, forecast stub, and verified-buyer lookup</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s2">
+    <div class="card">
+      <h2>Problem</h2>
+      <p>Smallholder farmers lack timely price information and access to trustworthy buyers. This leads to exploitation and post-harvest losses.</p>
+      <p class="small">Example: farmers in Northern Nigeria receive market prices late via intermediaries.</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s3">
+    <div class="card">
+      <h2>Solution (MVP)</h2>
+      <ul>
+        <li>Chat & voice bot in Hausa + English</li>
+        <li>Real-time local market prices + 7-day forecast stub</li>
+        <li>Verified buyer registry & contact method</li>
+      </ul>
+      <p class="small">Works on Web chat, SMS/WhatsApp (via Twilio), and serverless backend.</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s4">
+    <div class="card">
+      <h2>Architecture</h2>
+      <p class="meta">Bot → Function App (orchestrator) → Cognitive Search + Azure OpenAI + Azure ML + CosmosDB → Channels</p>
+      <p class="small">Tonight: local CSV fallback + prompt templates. Cloud: use Key Vault + Managed Identity for secrets.</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s5">
+    <div class="card">
+      <h2>Demo plan</h2>
+      <ol>
+        <li>Ask: "How much is maize in Kano?" — show price + forecast + recommendation</li>
+        <li>Ask: "Will price rise this week?" — show forecast percent</li>
+        <li>Ask: "Show verified buyers for maize in Kano" — show buyer list</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="slide" id="s6">
+    <div class="card">
+      <h2>Impact & Roadmap</h2>
+      <p>KPIs: active users, forecast error (MAE), % trades via verified buyers, farmer satisfaction.</p>
+      <p class="small">Phase 1: chat + RAG. Phase 2: ML forecasts + voice (Hausa) + WhatsApp. Phase 3: satellite NDVI alerts, ledger for verified trades.</p>
+      <p class="hint">Ask: mentorship, cloud credits, telco partner for USSD pilot.</p>
+    </div>
+  </div>
+
+  <div class="footer">Press ← / → to move slides. Record your screen and narrate with `speaker_script.md`.</div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let idx = 0;
+    function show(i){ slides.forEach((s,si)=>s.style.display = si===i ? 'flex' : 'none'); }
+    show(0);
+    window.addEventListener('keydown', e=>{ if (e.key==='ArrowRight') { idx = Math.min(idx+1, slides.length-1); show(idx) } if (e.key==='ArrowLeft') { idx = Math.max(idx-1, 0); show(idx) } });
+    // touch
+    let startX=0; window.addEventListener('touchstart', e=>startX=e.touches[0].clientX); window.addEventListener('touchend', e=>{ const dx = e.changedTouches[0].clientX - startX; if (dx<-50) { idx = Math.min(idx+1, slides.length-1); show(idx) } else if (dx>50) { idx = Math.max(idx-1,0); show(idx) } });
+  </script>
+</body>
+</html>
